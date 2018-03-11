@@ -35,6 +35,6 @@ var promotionSchema = new Schema({
 });
 
 
-var Promotions = mongoose.model('promotion', promotionSchema);
+var Promotions = mongoose.model('Promotion', promotionSchema);
 
 module.exports = Promotions; 
