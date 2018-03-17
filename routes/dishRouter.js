@@ -178,11 +178,18 @@ dishRouter.route('/:dishId/comments/:commentId')
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (dish != null && dish.comments.id(req.params.commentId) != null) {
+            let commentAuthor = dish.comments.id(req.params.commentId).author;
+            let authUser = req.user._id;
+            if (!commentAuthor.equals(authUser)) {
+                err = new Error('You are not alowed to edit this comment');
+                err.status = 403;
+                return next(err);
+            }
             if (req.body.rating) {
                 dish.comments.id(req.params.commentId).rating = req.body.rating;
             }
             if (req.body.comment) {
-                dish.comments.id(req.params.commentId).comment = req.body.comment;                
+                dish.comments.id(req.params.commentId).comment = req.body.comment;
             }
             dish.save()
             .then((dish) => {
@@ -208,12 +215,19 @@ dishRouter.route('/:dishId/comments/:commentId')
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (dish != null && dish.comments.id(req.params.commentId) != null) {
+            let commentAuthor = dish.comments.id(req.params.commentId).author;
+            let authUser = req.user._id;
+            if (!commentAuthor.equals(authUser)) {
+                err = new Error('You are not alowed to edit this comment');
+                err.status = 403;
+                return next(err);
+            }
             dish.comments.id(req.params.commentId).remove();
             dish.save()
             .then((dish) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
-                res.json(dish);                
+                res.json(dish);
             }, (err) => next(err));
         }
         else if (dish == null) {
@@ -224,9 +238,9 @@ dishRouter.route('/:dishId/comments/:commentId')
         else {
             err = new Error('Comment ' + req.params.commentId + ' not found');
             err.status = 404;
-            return next(err);            
+            return next(err);
         }
     }, (err) => next(err))
-    .catch((err) => next(err));
+    .catch((err) => next(err));                         
 });
 module.exports = dishRouter;
